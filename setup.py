@@ -154,7 +154,6 @@ setup(
     packages=find_packages(),
     test_suite='nose.collector',
     tests_require=open('requirements.test.txt').readlines(),
-    setup_requires=open('requirements.txt').readlines(),
     install_requires=open('requirements.txt').readlines(),
     dependency_links=[
         'https://github.com/diranged/python-rightscale-1/tarball/automatically_refresh_oauth_token#egg=python-rightscale-0.1.3'

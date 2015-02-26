@@ -150,6 +150,12 @@ class Macro(base.BaseActor):
             self.log.critical('Invalid JSON Schema.')
             raise exceptions.UnrecoverableActorFailure(e)
 
+    def get_orgchart(self, parent=''):
+        return self.initial_actor.get_orgchart(parent=parent)
+        ret = super(Macro, self).get_orgchart()
+        macro = self.initial_actor.get_orgchart(parent=str(id(self)))
+        return ret + macro
+
     @gen.coroutine
     def _execute(self):
         # initial_actor is configured with same dry parameter as this actor.

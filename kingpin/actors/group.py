@@ -62,6 +62,14 @@ class BaseGroupActor(base.BaseActor):
         # Pre-initialize all of our actions!
         self._actions = self._build_actions()
 
+    def get_orgchart(self, parent=''):
+        ret = super(BaseGroupActor, self).get_orgchart(parent=parent)
+
+        for act in self._actions:
+            ret = ret + act.get_orgchart(parent=str(id(self)))
+
+        return ret
+
     def _build_actions(self):
         """Builds either a single set of actions, or multiple sets.
 
@@ -150,6 +158,19 @@ class Sync(BaseGroupActor):
 class Async(BaseGroupActor):
 
     """Asynchronously executes all Actors at once"""
+
+    def get_orgchart(self, parent=''):
+        ret = super(BaseGroupActor, self).get_orgchart(parent=parent)
+
+        # Each actor would get the preceeding one as a parent This is perfectly
+        # opoosite logic for Sync/Async but creates a significantly better
+        # layout.
+        parent = str(id(self))
+        for act in self._actions:
+            ret = ret + act.get_orgchart(parent=parent)
+            parent = str(id(act))
+
+        return ret
 
     def _get_exc_type(self, exc_list):
         """Return Unrecoverable exception if at least one is in exc_list.

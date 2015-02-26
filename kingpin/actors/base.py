@@ -308,6 +308,15 @@ class BaseActor(object):
         # Finally, convert the string back into a dict and store it.
         self._options = json.loads(new_options_string)
 
+    def get_orgchart(self, parent=''):
+        return [
+            [{'v': str(id(self)),
+              # 'f': '%s: %s' % (self.__class__.__name__, self._desc)},
+              'f': self._desc},
+             parent,
+             '']
+        ]
+
     @gen.coroutine
     @timer
     def execute(self):

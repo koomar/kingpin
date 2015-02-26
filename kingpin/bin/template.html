@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['orgchart']}]}"></script>
+</head>
+<body>
+<div id="kp_actors_chart"></div>
+<script type="text/javascript">
+    google.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Name');
+        data.addColumn('string', 'Manager');
+        data.addColumn('string', 'ToolTip');
+
+
+        var row_definition = %ROW_DEFINITION%;
+
+        data.addRows(row_definition);
+
+        var chart = new google.visualization.OrgChart(document.getElementById('kp_actors_chart'));
+        chart.draw(data, {
+          allowHtml: true,
+          allowCollapse: true,
+          size: 'small'});
+    }
+</script>
+</body>
+</html>

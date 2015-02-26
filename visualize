@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+import json
+import logging
+import os
+import sys
+
+from kingpin.actors import misc
+from kingpin.constants import REQUIRED
+
+log = logging.getLogger(__name__)
+
+script_path = len(sys.argv) > 1 and sys.argv[1]
+
+if not script_path:
+    print "Usage: %s path/to/script.json" % sys.argv[0]
+    sys.exit(1)
+
+top_actor = misc.Macro('Kingpin', {'macro': script_path,
+                                   'tokens': dict(os.environ)})
+
+chart_data = top_actor.get_orgchart()
+
+raw_chart_data = json.dumps(chart_data, separators=(",", ': '), indent=4)
+
+template  = open('kingpin/bin/template.html', 'r')
+output = open('output.html', 'w')
+inserted  = template.read().replace("%ROW_DEFINITION%", raw_chart_data)
+output.write(inserted)
+
+print "Created %s" % output

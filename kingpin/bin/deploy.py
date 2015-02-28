@@ -15,6 +15,7 @@
 """CLI Script Runner for Kingpin."""
 
 import logging
+import json
 import optparse
 import os
 import sys
@@ -48,6 +49,7 @@ parser.add_option('-j', '--json', dest='json',
                   help='Path to JSON Deployment File')
 parser.add_option('-d', '--dry', dest='dry', action='store_true',
                   help='Executes a DRY run.')
+parser.add_option('-g', '--graph', dest='graph', help='Executes a DRY run.')
 
 # Logging Configuration
 parser.add_option('-l', '--level', dest='level', default='info',
@@ -62,6 +64,18 @@ def kingpin_fail(message):
     parser.print_help()
     sys.stderr.write('\nError: %s\n' % message)
     sys.exit(1)
+
+def graph(actor, graph_type):
+    chart_data = actor.get_report_data()
+
+    raw_chart_data = json.dumps(chart_data, separators=(",", ': '), indent=4)
+
+    template  = open('kingpin/bin/template/%s.html' % graph_type, 'r')
+    output = open('output.html', 'w')
+    inserted  = template.read().replace("%ROW_DEFINITION%", raw_chart_data)
+    output.write(inserted)
+
+    print "Created %s" % output
 
 
 @gen.coroutine
@@ -93,6 +107,7 @@ def main():
 
     try:
         log.info('Lights, camera ... action!')
+        runner = False
         runner = Macro(desc='Kingpin',
                        options={'macro': json_file,
                                 'tokens': env_tokens},
@@ -102,6 +117,9 @@ def main():
         log.error('Kingpin encountered mistakes during the play.')
         log.error(e)
         sys.exit(2)
+    finally:
+        if options.graph and runner:
+            graph(actor=runner, graph_type=options.graph)
 
 
 def begin():

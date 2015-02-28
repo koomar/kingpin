@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+</head>
+<body>
+<div id="kp_actors_chart" style="height:600px"></div>
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["orgchart", "timeline"]});
+    google.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        var chart = new google.visualization.Timeline(document.getElementById('kp_actors_chart'));
+
+        data.addColumn({ type: 'string', id: 'Title' });
+        data.addColumn({ type: 'string', id: 'Name' });
+        data.addColumn({ type: 'date', id: 'Start' });
+        data.addColumn({ type: 'date', id: 'End' });
+
+        var all_data = %ROW_DEFINITION%;
+
+        for (i in all_data) {
+            var row_data = all_data[i]
+
+            if (!row_data['start_time'] || !row_data['end_time']) {
+                continue;
+            }
+            var start = new Date(0); start.setUTCSeconds(row_data['start_time'])
+            var end = new Date(0); end.setUTCSeconds(row_data['end_time'] + .5)
+            row = [ row_data['parent'], row_data['desc'], start, end ]
+
+            data.addRow(row);
+        }
+
+        chart.draw(data, {
+          timeline: {
+            showRowLabels: false, singleColor: '#585',
+            barLabelStyle: { fontName: 'Helvetica', fontSize: 14 }
+          }
+        });
+
+    }
+</script>
+</body>
+</html>

@@ -128,6 +128,12 @@ class BaseActor(object):
                        'strict_init_context=%s)' %
                        (warn_on_failure, self.strict_init_context))
 
+        self._start_time = 0
+        self._end_time = 0
+        self._has_executed = False
+        self._execution_error = ''
+        self._execution_warning = ''
+
     def _setup_log(self):
         """Create a customized logging object based on the LogAdapter."""
         name = '%s.%s' % (self.__module__, self.__class__.__name__)
@@ -231,15 +237,17 @@ class BaseActor(object):
 
         def _wrap_in_timer(self, *args, **kwargs):
             # Log the start time
-            start_time = time.time()
+            self._start_time = time.time()
 
             # Begin the execution
-            ret = yield gen.coroutine(f)(self, *args, **kwargs)
-
-            # Log the finished execution time
-            exec_time = "%.2f" % (time.time() - start_time)
-            self.log.debug('%s.%s() execution time: %ss' %
-                           (self._type, f.__name__, exec_time))
+            try:
+                ret = yield gen.coroutine(f)(self, *args, **kwargs)
+            finally:
+                # Log the finished execution time
+                self._end_time = time.time()
+                exec_time = "%.2f" % (self._end_time - self._start_time)
+                self.log.debug('%s.%s() execution time: %ss' %
+                               (self._type, f.__name__, exec_time))
 
             raise gen.Return(ret)
         return _wrap_in_timer
@@ -308,14 +316,14 @@ class BaseActor(object):
         # Finally, convert the string back into a dict and store it.
         self._options = json.loads(new_options_string)
 
-    def get_orgchart(self, parent=''):
-        return [
-            [{'v': str(id(self)),
-              # 'f': '%s: %s' % (self.__class__.__name__, self._desc)},
-              'f': self._desc},
-             parent,
-             '']
-        ]
+    def get_report_data(self, parent=''):
+        return [{
+            'uid': str(id(self)),
+            'actor': self.__class__.__name__,
+            'desc': self._desc,
+            'start_time': self._start_time,
+            'end_time': self._end_time,
+            'parent': parent}]
 
     @gen.coroutine
     @timer
@@ -373,7 +381,7 @@ class BaseActor(object):
             log.critical('Unexpected exception caught! '
                          'Please contact the author (%s) and provide them '
                          'with this stacktrace' %
-                         sys.modules[self.__module__].__author__)
+                         (sys.modules[self.__module__].__author__,))
             self.log.exception(e)
             raise exceptions.ActorException(e)
         else:

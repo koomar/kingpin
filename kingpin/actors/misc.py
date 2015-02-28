@@ -150,10 +150,10 @@ class Macro(base.BaseActor):
             self.log.critical('Invalid JSON Schema.')
             raise exceptions.UnrecoverableActorFailure(e)
 
-    def get_orgchart(self, parent=''):
-        return self.initial_actor.get_orgchart(parent=parent)
-        ret = super(Macro, self).get_orgchart()
-        macro = self.initial_actor.get_orgchart(parent=str(id(self)))
+    def get_report_data(self, parent=''):
+        return self.initial_actor.get_report_data(parent=parent)
+        ret = super(Macro, self).get_report_data()
+        macro = self.initial_actor.get_report_data(parent=str(id(self)))
         return ret + macro
 
     @gen.coroutine
@@ -183,6 +183,7 @@ class Sleep(base.BaseActor):
         if isinstance(sleep, basestring):
             sleep = float(sleep)
 
+        raise exceptions.InvalidOptions('boom')
         if not self._dry:
             yield utils.tornado_sleep(seconds=sleep)
 

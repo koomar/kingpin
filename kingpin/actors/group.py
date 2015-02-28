@@ -62,11 +62,11 @@ class BaseGroupActor(base.BaseActor):
         # Pre-initialize all of our actions!
         self._actions = self._build_actions()
 
-    def get_orgchart(self, parent=''):
-        ret = super(BaseGroupActor, self).get_orgchart(parent=parent)
+    def get_report_data(self, parent=''):
+        ret = super(BaseGroupActor, self).get_report_data(parent=parent)
 
         for act in self._actions:
-            ret = ret + act.get_orgchart(parent=str(id(self)))
+            ret = ret + act.get_report_data(parent=str(id(self)))
 
         return ret
 
@@ -159,15 +159,15 @@ class Async(BaseGroupActor):
 
     """Asynchronously executes all Actors at once"""
 
-    def get_orgchart(self, parent=''):
-        ret = super(BaseGroupActor, self).get_orgchart(parent=parent)
+    def get_report_data(self, parent=''):
+        ret = super(BaseGroupActor, self).get_report_data(parent=parent)
 
         # Each actor would get the preceeding one as a parent This is perfectly
         # opoosite logic for Sync/Async but creates a significantly better
         # layout.
         parent = str(id(self))
         for act in self._actions:
-            ret = ret + act.get_orgchart(parent=parent)
+            ret = ret + act.get_report_data(parent=parent)
             parent = str(id(act))
 
         return ret

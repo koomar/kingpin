@@ -10,9 +10,9 @@
       ] } },
 
       { "desc": "stage 2", "actor": "group.Async", "options": { "acts": [
-        { "desc": "launch serverA", "actor": "rightscale.server_array.Launch", "options": { "array": "serverA" } },
-        { "desc": "launch serverB", "actor": "rightscale.server_array.Launch", "options": { "array": "serverB" } },
-        { "desc": "launch serverC", "actor": "rightscale.server_array.Launch", "options": { "array": "serverC" } }
+        { "desc": "launch serverA", "actor": "rightscale.server_array.Launch", "options": { "array": "serverA", "count": 1 } },
+        { "desc": "launch serverB", "actor": "rightscale.server_array.Launch", "options": { "array": "serverB", "count": 1 } },
+        { "desc": "launch serverC", "actor": "rightscale.server_array.Launch", "options": { "array": "serverC", "count": 1 } }
       ] } },
 
       { "desc": "stage 3", "actor": "group.Async", "options": { "acts": [

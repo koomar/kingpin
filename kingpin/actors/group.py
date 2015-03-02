@@ -62,11 +62,12 @@ class BaseGroupActor(base.BaseActor):
         # Pre-initialize all of our actions!
         self._actions = self._build_actions()
 
-    def get_report_data(self, parent=''):
-        ret = super(BaseGroupActor, self).get_report_data(parent=parent)
+    def get_report_data(self, parent='', depth=0):
+        ret = super(BaseGroupActor, self).get_report_data(parent, depth)
 
+        parent = str(id(self))
         for act in self._actions:
-            ret = ret + act.get_report_data(parent=str(id(self)))
+            ret = ret + act.get_report_data(parent, depth+1)
 
         return ret
 
@@ -158,19 +159,6 @@ class Sync(BaseGroupActor):
 class Async(BaseGroupActor):
 
     """Asynchronously executes all Actors at once"""
-
-    def get_report_data(self, parent=''):
-        ret = super(BaseGroupActor, self).get_report_data(parent=parent)
-
-        # Each actor would get the preceeding one as a parent This is perfectly
-        # opoosite logic for Sync/Async but creates a significantly better
-        # layout.
-        parent = str(id(self))
-        for act in self._actions:
-            ret = ret + act.get_report_data(parent=parent)
-            parent = str(id(act))
-
-        return ret
 
     def _get_exc_type(self, exc_list):
         """Return Unrecoverable exception if at least one is in exc_list.

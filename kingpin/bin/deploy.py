@@ -49,7 +49,7 @@ parser.add_option('-j', '--json', dest='json',
                   help='Path to JSON Deployment File')
 parser.add_option('-d', '--dry', dest='dry', action='store_true',
                   help='Executes a DRY run.')
-parser.add_option('-g', '--graph', dest='graph', help='Executes a DRY run.')
+parser.add_option('-g', '--graph', dest='graph', help='Creates an html file')
 
 # Logging Configuration
 parser.add_option('-l', '--level', dest='level', default='info',
@@ -65,14 +65,15 @@ def kingpin_fail(message):
     sys.stderr.write('\nError: %s\n' % message)
     sys.exit(1)
 
+
 def graph(actor, graph_type):
     chart_data = actor.get_report_data()
 
     raw_chart_data = json.dumps(chart_data, separators=(",", ': '), indent=4)
 
-    template  = open('kingpin/bin/template/%s.html' % graph_type, 'r')
+    template = open('kingpin/bin/template/%s.html' % graph_type, 'r')
     output = open('output.html', 'w')
-    inserted  = template.read().replace("%ROW_DEFINITION%", raw_chart_data)
+    inserted = template.read().replace("%ROW_DEFINITION%", raw_chart_data)
     output.write(inserted)
 
     print "Created %s" % output

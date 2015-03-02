@@ -4,7 +4,8 @@
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 </head>
 <body>
-<div id="kp_actors_chart" style="height:600px"></div>
+<div id="kp_actors_chart" style="width:2400px; height:600px"></div>
+<pre id="kp_actors_text"></pre>
 <script type="text/javascript">
     google.load("visualization", "1", {packages:["orgchart", "timeline"]});
     google.setOnLoadCallback(drawChart);
@@ -19,26 +20,47 @@
 
         var all_data = %ROW_DEFINITION%;
 
+        var table_data = Array(['Group', 'Description', 'Time start', 'Time end']);
         for (i in all_data) {
             var row_data = all_data[i]
 
             if (!row_data['start_time'] || !row_data['end_time']) {
                 continue;
             }
-            var start = new Date(0); start.setUTCSeconds(row_data['start_time'])
-            var end = new Date(0); end.setUTCSeconds(row_data['end_time'] + .5)
-            row = [ row_data['parent'], row_data['desc'], start, end ]
+            var start = new Date(0); start.setUTCMilliseconds(row_data['start_time'] * 1000)
+            var end = new Date(0); end.setUTCMilliseconds(row_data['end_time'] * 1000)
+            var row = [
+                row_data['depth'].toString(),
+                {'v': row_data['desc'],
+                 'f': row_data},
+                start, end ]
 
-            data.addRow(row);
+            table_data.push(row)
+
+
+            //data.addRow(row);
         }
 
+        data = google.visualization.arrayToDataTable(table_data);
+        google.visualization.events.addListener(chart, 'select', function() {
+                  selectHandler(chart.getSelection(), data)});
+
+
         chart.draw(data, {
+          width: '2400px',
           timeline: {
-            showRowLabels: false, singleColor: '#585',
+            showRowLabels: false,
+            singleColor: '#585',
             barLabelStyle: { fontName: 'Helvetica', fontSize: 14 }
           }
         });
 
+    }
+    function selectHandler(item, data) {
+        item = item[0];
+        metadata = data.getFormattedValue(item.row, 1);
+        text = document.getElementById("kp_actors_text");
+        text.innerHTML = JSON.stringify(metadata);
     }
 </script>
 </body>

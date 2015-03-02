@@ -316,14 +316,15 @@ class BaseActor(object):
         # Finally, convert the string back into a dict and store it.
         self._options = json.loads(new_options_string)
 
-    def get_report_data(self, parent=''):
+    def get_report_data(self, parent='', depth=0):
         return [{
             'uid': str(id(self)),
             'actor': self.__class__.__name__,
             'desc': self._desc,
             'start_time': self._start_time,
             'end_time': self._end_time,
-            'parent': parent}]
+            'parent': parent,
+            'depth': depth}]
 
     @gen.coroutine
     @timer
